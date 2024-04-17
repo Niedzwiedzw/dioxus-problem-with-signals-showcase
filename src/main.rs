@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 
+use std::convert::identity;
+
 use dioxus::prelude::*;
 use log::LevelFilter;
 
@@ -33,7 +35,7 @@ impl PartialEq for Something {
 }
 
 #[component]
-fn LevelTwo(count_1: Something, count_2: ReadOnlySignal<Something>) -> Element {
+fn LevelTwo(count_1: Something, count_2: MappedSignal<Something>) -> Element {
     rsx! {
         div {
             class: "LevelThree",
@@ -44,10 +46,10 @@ fn LevelTwo(count_1: Something, count_2: ReadOnlySignal<Something>) -> Element {
 }
 
 #[component]
-fn LevelOne(count_1: ReadOnlySignal<Something>, count_2: ReadOnlySignal<Something>) -> Element {
+fn LevelOne(count_1: MappedSignal<Something>, count_2: MappedSignal<Something>) -> Element {
     rsx! {
         LevelTwo {
-            count_1: count_2.read().clone(),
+            count_1: count_1.read().clone(),
             count_2
         }
     }
@@ -61,8 +63,8 @@ fn Home() -> Element {
         div {
             h1 { "High-Five counter" }
             LevelOne {
-                count_1: ReadOnlySignal::from(count_1),
-                count_2: ReadOnlySignal::from(count_2)
+                count_1: count_1.map(|v| v),
+                count_2: count_2.map(|v| v),
             }
         }
     }
