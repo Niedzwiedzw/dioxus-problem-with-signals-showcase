@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 
+use std::convert::identity;
+
 use dioxus::prelude::*;
 use log::LevelFilter;
 
@@ -26,6 +28,17 @@ fn App() -> Element {
 #[derive(Debug, Clone)]
 struct Something(i32);
 
+#[derive(PartialEq, Clone, Copy)]
+struct Readonly<T: 'static> {
+    signal: Signal<T>,
+}
+
+impl<T> From<Signal<T>> for Readonly<T> {
+    fn from(signal: Signal<T>) -> Self {
+        Readonly { signal }
+    }
+}
+
 impl PartialEq for Something {
     fn eq(&self, other: &Self) -> bool {
         false
@@ -33,7 +46,7 @@ impl PartialEq for Something {
 }
 
 #[component]
-fn LevelTwo(count_1: Something, count_2: ReadOnlySignal<Something>) -> Element {
+fn LevelTwo(count_1: Something, count_2: Readonly<Something>) -> Element {
     rsx! {
         div {
             class: "LevelThree",
@@ -44,10 +57,13 @@ fn LevelTwo(count_1: Something, count_2: ReadOnlySignal<Something>) -> Element {
 }
 
 #[component]
-fn LevelOne(count_1: ReadOnlySignal<Something>, count_2: ReadOnlySignal<Something>) -> Element {
+fn LevelOne(count_1: Readonly<Something>, count_2: Readonly<Something>) -> Element {
     rsx! {
         LevelTwo {
-            count_1: count_2.read().clone(),
+            count_1: {
+                let Something(count_1) = count_1.signal.read().clone();
+                Something(count_1 + 1)
+            },
             count_2
         }
     }
@@ -60,9 +76,11 @@ fn Home() -> Element {
     rsx! {
         div {
             h1 { "High-Five counter" }
+            button { onclick: move |_| {count_1.write().0 += 1}, "bump count_1" }
+            button { onclick: move |_| {count_2.write().0 += 1}, "bump count_2" }
             LevelOne {
-                count_1: ReadOnlySignal::from(count_1),
-                count_2: ReadOnlySignal::from(count_2)
+                count_1: Readonly::from(count_1),
+                count_2: Readonly::from(count_2)
             }
         }
     }
