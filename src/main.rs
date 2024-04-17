@@ -32,13 +32,8 @@ impl PartialEq for Something {
     }
 }
 
-#[derive(Props, PartialEq, Clone)]
-struct LevelTwoProps {
-    count_1: Something,
-    count_2: ReadOnlySignal<Something>,
-}
-
-fn LevelTwo(LevelTwoProps { count_1, count_2 }: LevelTwoProps) -> Element {
+#[component]
+fn LevelTwo(count_1: Something, count_2: ReadOnlySignal<Something>) -> Element {
     rsx! {
         div {
             class: "LevelThree",
@@ -48,13 +43,8 @@ fn LevelTwo(LevelTwoProps { count_1, count_2 }: LevelTwoProps) -> Element {
     }
 }
 
-#[derive(Props, PartialEq, Clone)]
-struct LevelOneProps {
-    count_1: ReadOnlySignal<Something>,
-    count_2: ReadOnlySignal<Something>,
-}
-
-fn LevelOne(LevelOneProps { count_1, count_2 }: LevelOneProps) -> Element {
+#[component]
+fn LevelOne(count_1: ReadOnlySignal<Something>, count_2: ReadOnlySignal<Something>) -> Element {
     rsx! {
         LevelTwo {
             count_1: count_2.read().clone(),
