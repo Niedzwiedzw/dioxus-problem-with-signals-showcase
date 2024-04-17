@@ -39,8 +39,8 @@ fn LevelTwo(count_1: Something, count_2: MappedSignal<Something>) -> Element {
     rsx! {
         div {
             class: "LevelThree",
-            // "count_1: {count_1}"
-            // "count_2: {count_2}"
+            "count_1: {count_1:?}"
+            "count_2: {count_2:?}"
         }
     }
 }
@@ -62,6 +62,9 @@ fn Home() -> Element {
     rsx! {
         div {
             h1 { "High-Five counter" }
+
+            button { onclick: move |_| {count_1.write().0 += 1}, "bump count_1" }
+            button { onclick: move |_| {count_2.write().0 += 1}, "bump count_2" }
             LevelOne {
                 count_1: count_1.map(|v| v),
                 count_2: count_2.map(|v| v),
